@@ -1,13 +1,14 @@
+import { action, createModule, createProxy, extractVuexModule, mutation } from 'vuex-class-component';
+
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { VuexModule, mutation, action, getter, Module } from 'vuex-class-component';
 
 Vue.use(Vuex);
 
-@Module({ namespacedPath: 'counter/' })
+const VuexModule = createModule();
+
 export class CounterStore extends VuexModule {
 
-  @getter
   public count: number = 0;
 
   @mutation
@@ -20,14 +21,14 @@ export class CounterStore extends VuexModule {
     this.count--;
   }
 
-  @action()
-  public incrementIfOdd() {
+  @action
+  public async incrementIfOdd() {
     if ((this.count + 1) % 2 === 0) {
       this.increment();
     }
   }
 
-  @action()
+  @action
   public async incrementAsync() {
     return setTimeout(() => this.increment(), 1000);
   }
@@ -35,12 +36,12 @@ export class CounterStore extends VuexModule {
 
 const store = new Vuex.Store({
   modules: {
-    counter: CounterStore.ExtractVuexModule(CounterStore),
+    ...extractVuexModule(CounterStore),
   },
 });
 
 export default store;
 
 export const vxm = {
-  counter: CounterStore.CreateProxy(store, CounterStore),
+  counter: createProxy(store, CounterStore),
 };
